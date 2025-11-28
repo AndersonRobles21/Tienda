@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: django_db
+    restart: always
+    environment:
+      POSTGRES_DB: djangodb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5433:5432"   # <--- AHORA ESTÁ EN EL LUGAR CORRECTO
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  web:
+    build: .
+    container_name: django_web
+    command: gunicorn settings.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://admin:admin123@db:5432/djangodb
+
+volumes:
+  postgres_data:
