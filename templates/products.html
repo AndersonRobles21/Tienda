@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos - Shop API{% endblock %}
+
+{% block content %}
+<h2>Gestión de Productos</h2>
+
+<div class="card">
+    <h3>Crear Nuevo Producto</h3>
+    <form method="post" action="{% url 'products' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Nombre del Producto:</label>
+            <input type="text" id="name" name="name" required placeholder="Ej: Laptop">
+        </div>
+        <div class="form-group">
+            <label for="price">Precio:</label>
+            <input type="number" id="price" name="price" step="0.01" required placeholder="Ej: 999.99">
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" required placeholder="Ej: 10">
+        </div>
+        <button type="submit" class="btn btn-success">Crear Producto</button>
+    </form>
+</div>
+
+<h3 style="margin-top: 30px;">Productos Disponibles</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="products-list">
+        <tr>
+            <td colspan="5" style="text-align: center; color: #999;">Cargando productos...</td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    // Función para cargar productos desde la API
+    async function loadProducts() {
+        try {
+            const response = await fetch('/api/products/', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            
+            if (response.status === 401) {
+                document.getElementById('products-list').innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; color: #f56565;"><strong>Debes estar autenticado para ver los productos</strong></td></tr>';
+                return;
+            }
+            
+            const data = await response.json();
+            const products = data.results || data;
+            
+            if (products.length === 0) {
+                document.getElementById('products-list').innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; color: #999;">No hay productos disponibles</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            products.forEach(product => {
+                html += `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>$${product.price}</td>
+                        <td>${product.stock}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editProduct(${product.id})">Editar</button>
+                            <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('products-list').innerHTML = html;
+        } catch (error) {
+            document.getElementById('products-list').innerHTML = 
+                '<tr><td colspan="5" style="text-align: center; color: #f56565;"><strong>Error al cargar productos</strong></td></tr>';
+            console.error('Error:', error);
+        }
+    }
+    
+    function editProduct(id) {
+        alert('Editar producto ' + id + ' (función en desarrollo)');
+    }
+    
+    function deleteProduct(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+            alert('Eliminar producto ' + id + ' (función en desarrollo)');
+        }
+    }
+    
+    // Cargar productos al iniciar la página
+    loadProducts();
+</script>
+{% endblock %}

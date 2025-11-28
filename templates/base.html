@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Shop API{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pedidos </h1>
+            <p>Gestiona productos y pedidos fácilmente</p>
+            <nav>
+                <a href="{% url 'home' %}">Inicio</a>
+                <a href="{% url 'products' %}">Productos</a>
+                <a href="{% url 'orders' %}">Pedidos</a>
+                <a href="/admin/">Admin</a>
+            </nav>
+        </header>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script>
+        // Mostrar/ocultar botones de login/logout según el token
+        function updateAuthButtons() {
+            const token = localStorage.getItem('token');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            if (token) {
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+            } else {
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+        
+        function logout() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('refresh_token');
+                updateAuthButtons();
+                window.location.href = '/';
+            }
+        }
+        
+        // Actualizar botones al cargar la página
+        updateAuthButtons();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

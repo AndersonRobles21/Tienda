@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Shop API{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h3>Bienvenido a Shop API</h3>
+    <p style="margin-bottom: 15px;">Esta es una API REST para gestionar productos y pedidos. Utiliza autenticación JWT para acceder a los endpoints protegidos.</p>
+
+    <div style="background: white; padding: 15px; border-radius: 5px;">
+        <h4 style="margin-bottom: 10px;">🔗 Endpoints Disponibles:</h4>
+        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;"><code>GET    /api/                    - Esta página
+GET    /api/products/           - Listar productos
+POST   /api/products/           - Crear producto
+GET    /api/products/{id}/      - Detalle del producto
+PUT    /api/products/{id}/      - Actualizar producto
+DELETE /api/products/{id}/      - Eliminar producto
+
+GET    /api/orders/             - Listar mis pedidos
+POST   /api/orders/             - Crear pedido
+GET    /api/orders/{id}/        - Detalle del pedido
+PUT    /api/orders/{id}/        - Actualizar pedido
+DELETE /api/orders/{id}/        - Eliminar pedido
+
+POST   /api/login/              - Obtener token JWT
+POST   /api/refresh/            - Refrescar token JWT</code></pre>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+orders {% extends 'base.html' %}
+
+{% block title %}Pedidos - Shop API{% endblock %}
+
+{% block content %}
+<h2>Gestión de Pedidos</h2>
+
+<div class="card">
+    <h3>Crear Nuevo Pedido</h3>
+    <form method="post" action="{% url 'orders' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="product">Producto:</label>
+            <select id="product" name="product" required>
+                <option value="">Selecciona un producto...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="quantity">Cantidad:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" required>
+        </div>
+        <button type="submit" class="btn btn-success">Crear Pedido</button>
+    </form>
+</div>
+
+<h3 style="margin-top: 30px;">Mis Pedidos</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="orders-list">
+        <tr>
+            <td colspan="5" style="text-align: center; color: #999;">Cargando pedidos...</td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    // Función para cargar productos
+    async function loadProductsForSelect() {
+        try {
+            const response = await fetch('/api/products/', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            
+            const data = await response.json();
+            const products = data.results || data;
+            
+            let html = '<option value="">Selecciona un producto...</option>';
+            products.forEach(product => {
+                html += `<option value="${product.id}">${product.name} - $${product.price}</option>`;
+            });
+            
+            document.getElementById('product').innerHTML = html;
+        } catch (error) {
+            console.error('Error al cargar productos:', error);
+        }
+    }
+    
+    // Función para cargar pedidos
+    async function loadOrders() {
+        try {
+            const response = await fetch('/api/orders/', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            
+            if (response.status === 401) {
+                document.getElementById('orders-list').innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; color: #f56565;"><strong>Debes estar autenticado para ver tus pedidos</strong></td></tr>';
+                return;
+            }
+            
+            const data = await response.json();
+            const orders = data.results || data;
+            
+            if (orders.length === 0) {
+                document.getElementById('orders-list').innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; color: #999;">No tienes pedidos aún</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            orders.forEach(order => {
+                const date = new Date(order.created_at).toLocaleDateString('es-ES');
+                html += `
+                    <tr>
+                        <td>${order.id}</td>
+                        <td>${order.product}</td>
+                        <td>${order.quantity}</td>
+                        <td>${date}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editOrder(${order.id})">Editar</button>
+                            <button class="btn btn-danger" onclick="deleteOrder(${order.id})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('orders-list').innerHTML = html;
+        } catch (error) {
+            document.getElementById('orders-list').innerHTML = 
+                '<tr><td colspan="5" style="text-align: center; color: #f56565;"><strong>Error al cargar pedidos</strong></td></tr>';
+            console.error('Error:', error);
+        }
+    }
+    
+    function editOrder(id) {
+        alert('Editar pedido ' + id + ' (función en desarrollo)');
+    }
+    
+    function deleteOrder(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este pedido?')) {
+            alert('Eliminar pedido ' + id + ' (función en desarrollo)');
+        }
+    }
+    
+    // Cargar datos al iniciar la página
+    loadProductsForSelect();
+    loadOrders();
+</script>
+{% endblock %}
