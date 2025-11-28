@@ -5,3 +5,8 @@ djangorestframework_simplejwt==5.5.1
 PyJWT==2.10.1
 sqlparse==0.5.4
 tzdata==2025.2
+
+# Necesarios para Render
+gunicorn==23.0.0
+psycopg2-binary==2.9.10
+python-dotenv==1.0.1
